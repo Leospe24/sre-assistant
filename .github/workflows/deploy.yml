@@ -23,6 +23,11 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  TF_IN_AUTOMATION: "true"
+  AWS_REGION: "us-east-1"
+  AWS_DEFAULT_REGION: "us-east-1"
+
 jobs:
   terraform:
     name: "Terraform Execution"
@@ -52,7 +57,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Plan
         if: |
@@ -60,10 +65,10 @@ jobs:
           github.event_name == 'pull_request' || 
           github.event.inputs.action == 'plan' || 
           github.event.inputs.action == 'plan-and-apply'
-        run: terraform plan
+        run: terraform plan -input=false
 
       - name: Terraform Apply
         if: |
           github.event_name == 'workflow_dispatch' && 
           (github.event.inputs.action == 'apply' || github.event.inputs.action == 'plan-and-apply')
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
