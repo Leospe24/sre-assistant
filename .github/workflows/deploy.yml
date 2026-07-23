@@ -1,0 +1,70 @@
+name: "SRE Assistant Infrastructure CI/CD"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Enables manual trigger button with custom choices
+    inputs:
+      action:
+        description: "Choose Terraform action to execute"
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - plan
+          - apply
+          - plan-and-apply
+
+permissions:
+  id-token: write # Required for requesting the OIDC token
+  contents: read
+
+jobs:
+  terraform:
+    name: "Terraform Execution"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Package Lambda Payload
+        run: |
+          zip lambda_payload.zip app.py
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      # Always run plan if triggered by push/PR OR if plan / plan-and-apply is selected manually
+      - name: Terraform Plan
+        if: |
+          github.event_name == 'push' || 
+          github.event_name == 'pull_request' || 
+          github.event.inputs.action == 'plan' || 
+          github.event.inputs.action == 'plan-and-apply'
+        run: terraform plan
+
+      # Only run apply if manually explicitly triggered with 'apply' or 'plan-and-apply'
+      - name: Terraform Apply
+        if: |
+          github.event_name == 'workflow_dispatch' && 
+          (github.event.inputs.action == 'apply' || github.event.inputs.action == 'plan-and-apply')
+        run: terraform apply -auto-approve
