@@ -23,8 +23,10 @@ resource "aws_iam_role" "github_actions_role" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            # Update Leospe24 if your current GitHub username is different!
-            "token.actions.githubusercontent.com:sub" = "repo:Leospe24/sre-assistant:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:Leospe24/sre-assistant:*",
+              "repo:leospe24/sre-assistant:*"
+            ]
           }
         }
       }
