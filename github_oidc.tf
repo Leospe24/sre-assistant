@@ -24,8 +24,8 @@ resource "aws_iam_role" "github_actions_role" {
           }
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
-              "repo:Leospe24/sre-assistant:*",
-              "repo:leospe24/sre-assistant:*"
+              "repo:Leospe24*/sre-assistant*:*",
+              "repo:leospe24*/sre-assistant*:*"
             ]
           }
         }
