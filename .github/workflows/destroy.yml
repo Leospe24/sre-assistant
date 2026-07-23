@@ -7,13 +7,15 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  TF_IN_AUTOMATION: "true"
+  AWS_REGION: "us-east-1"
+  AWS_DEFAULT_REGION: "us-east-1"
+
 jobs:
   destroy:
     name: "Terraform Destroy"
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Checkout Code
@@ -39,7 +41,9 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+        env:
+          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: terraform destroy -auto-approve -input=false
