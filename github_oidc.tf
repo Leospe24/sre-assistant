@@ -21,7 +21,7 @@ resource "aws_iam_role" "github_actions_role" {
         Condition = {
           StringLike = {
             # Restrict execution to your specific GitHub repository
-            "token.actions.githubusercontent.com:sub" = "repo:YOUR_GITHUB_USERNAME/YOUR_REPO_NAME:*"
+            "token.actions.githubusercontent.com:sub" = "repo:Leospe24/sre-assistant:*"
           }
         }
       }
