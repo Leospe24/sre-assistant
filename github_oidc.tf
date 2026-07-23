@@ -23,7 +23,6 @@ resource "aws_iam_role" "github_actions_role" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            # Wildcard * at the start and end ensures pushes, PRs, and manual workflow_dispatch runs pass
             "token.actions.githubusercontent.com:sub" = [
               "repo:Leospe24/sre-assistant:*",
               "repo:leospe24/sre-assistant:*"
@@ -35,7 +34,7 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# 3. Attach AdministratorAccess or required policies
+# 3. Attach AdministratorAccess policy
 resource "aws_iam_role_policy_attachment" "github_actions_admin" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
