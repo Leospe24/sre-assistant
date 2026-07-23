@@ -1,11 +1,11 @@
-# 1. Create OIDC Provider for GitHub Actions
+# 1. GitHub OIDC Provider
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-# 2. IAM Role for GitHub Actions Runner
+# 2. IAM Role with strict Trust Policy
 resource "aws_iam_role" "github_actions_role" {
   name = "github-actions-sre-assistant-role"
 
@@ -19,8 +19,11 @@ resource "aws_iam_role" "github_actions_role" {
           Federated = aws_iam_openid_connect_provider.github.arn
         }
         Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
           StringLike = {
-            # Restrict execution to your specific GitHub repository
+            # Update Leospe24 if your current GitHub username is different!
             "token.actions.githubusercontent.com:sub" = "repo:Leospe24/sre-assistant:*"
           }
         }
@@ -29,7 +32,7 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# 3. Attach AdministratorAccess or custom policies for Terraform provisioning
+# 3. Attach Permissions Policy
 resource "aws_iam_role_policy_attachment" "github_actions_admin" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
