@@ -9,9 +9,3 @@ variable "bedrock_model_id" {
   default     = "us.amazon.nova-micro-v1:0"
   description = "Bedrock Model ID or Cross-Region Inference Profile ARN"
 }
-
-variable "slack_webhook_url" {
-  type        = string
-  sensitive   = true
-  description = "Incoming Slack Webhook URL"
-}

@@ -1,0 +1,4 @@
+{
+  "alert_type": "cpu_spike",
+  "message": "High CPU utilization detected on production cluster."
+}

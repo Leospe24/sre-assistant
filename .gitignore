@@ -27,6 +27,9 @@ ENV/
 # Logs
 *.log
 
+# Audit & Private notes
+audit.md
+
 # OS & Editor files
 .DS_Store
 .vscode/

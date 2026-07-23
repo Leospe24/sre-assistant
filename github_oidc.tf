@@ -23,10 +23,7 @@ resource "aws_iam_role" "github_actions_role" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = [
-              "repo:Leospe24*/sre-assistant*:*",
-              "repo:leospe24*/sre-assistant*:*"
-            ]
+            "token.actions.githubusercontent.com:sub" = "repo:Leospe24/sre-assistant:*"
           }
         }
       }
@@ -34,10 +31,41 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# 3. Attach AdministratorAccess policy
-resource "aws_iam_role_policy_attachment" "github_actions_admin" {
-  role       = aws_iam_role.github_actions_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# 3. Scoped Least-Privilege Policy for Infrastructure Deployments
+resource "aws_iam_role_policy" "github_actions_scoped_policy" {
+  name = "GitHubActionsSREAssistantScopedPolicy"
+  role = aws_iam_role.github_actions_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:*",
+          "iam:CreateRole",
+          "iam:GetRole",
+          "iam:DeleteRole",
+          "iam:PutRolePolicy",
+          "iam:GetRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PassRole",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "logs:*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 output "github_actions_role_arn" {

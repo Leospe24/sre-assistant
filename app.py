@@ -149,6 +149,9 @@ def lambda_handler(event, context):
     """
     print(f"📥 Received Lambda Event: {json.dumps(event)}")
 
+    if not isinstance(event, dict):
+        event = {"raw_log": str(event)}
+
     raw_log = ""
 
     # Case 1: Triggered directly by CloudWatch Logs Subscription Filter (Gzipped + Base64)
@@ -169,6 +172,11 @@ def lambda_handler(event, context):
         raw_log = event["raw_log"]
     else:
         raw_log = str(event)
+
+    # Safety truncation cap (max 4,000 chars) to prevent prompt token limit overflow
+    MAX_LOG_LENGTH = 4000
+    if len(raw_log) > MAX_LOG_LENGTH:
+        raw_log = raw_log[:MAX_LOG_LENGTH] + "\n... [Truncated remaining log payload for analysis]"
 
     print(f"🔍 Extracted Raw Log Payload:\n{raw_log}")
 

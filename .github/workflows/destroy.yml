@@ -44,6 +44,4 @@ jobs:
         run: terraform init -input=false
 
       - name: Terraform Destroy
-        env:
-          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform destroy -auto-approve -input=false

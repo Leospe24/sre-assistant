@@ -42,6 +42,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Run Unit Tests
+        run: |
+          python -m unittest test_app.py
+
       - name: Package Lambda Payload
         run: |
           zip lambda_payload.zip app.py
@@ -65,14 +69,10 @@ jobs:
           github.event_name == 'pull_request' || 
           github.event.inputs.action == 'plan' || 
           github.event.inputs.action == 'plan-and-apply'
-        env:
-          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform plan -input=false
 
       - name: Terraform Apply
         if: |
           github.event_name == 'workflow_dispatch' && 
           (github.event.inputs.action == 'apply' || github.event.inputs.action == 'plan-and-apply')
-        env:
-          TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: terraform apply -auto-approve -input=false
