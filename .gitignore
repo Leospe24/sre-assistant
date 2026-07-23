@@ -1,0 +1,33 @@
+# Environment & Secret files
+.env
+*.env
+
+# Terraform variables & state files
+*.tfvars
+!terraform.tfvars.example
+*.tfvars.json
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Test & Build artifacts
+*.zip
+response.json
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Logs
+*.log
+
+# OS & Editor files
+.DS_Store
+.vscode/
+.idea/
